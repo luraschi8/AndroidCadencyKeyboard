@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="2703b54f9d7ee96ee1c83e1b348aeaff2815bafd">
+        <dex dex="/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_a557177a34f78d5043bd813e41320ebc4c7d1392/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="1d22dd59765ce3368ebf09d9938c39b44eb77ad8">
+        <dex dex="/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_f11504279b8bfb0a0cd25f99457009cb0908e24b/classes.dex" />
+    </item>
+
+</items>

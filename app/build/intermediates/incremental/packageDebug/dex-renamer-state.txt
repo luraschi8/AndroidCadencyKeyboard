@@ -1,0 +1,7 @@
+#Tue Dec 13 11:19:22 ART 2016
+base.0=/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_a557177a34f78d5043bd813e41320ebc4c7d1392
+renamed.1=classes.dex
+renamed.0=classes2.dex
+file.1=/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_f11504279b8bfb0a0cd25f99457009cb0908e24b/classes.dex
+base.1=/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_f11504279b8bfb0a0cd25f99457009cb0908e24b
+file.0=/Users/matias/Documents/TP_Ptof/Keyboard/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_a557177a34f78d5043bd813e41320ebc4c7d1392/classes.dex
