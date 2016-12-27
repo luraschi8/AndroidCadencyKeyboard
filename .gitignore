@@ -41,3 +41,6 @@ captures/
 
 local.properties
 .idea/
+app/build
+app/build/
+app/app.iml
