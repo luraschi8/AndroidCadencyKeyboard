@@ -34,6 +34,8 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
+import com.example.android.cadencyKeyboard.keyboardSession.KeyboardSession;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +81,9 @@ public class CadencyKeyboard extends InputMethodService
     private LatinKeyboard mCurKeyboard;
     
     private String mWordSeparators;
-    
+
+    private KeyboardSession session;
+
     /**
      * Main initialization of the input method component.  Be sure to call
      * to super class.
@@ -145,9 +149,11 @@ public class CadencyKeyboard extends InputMethodService
      * bound to the client, and are now receiving all of the detailed information
      * about the target of our edits.
      */
+    //En este punto el teclado puede no estar dibujado en pantalla.
+    //Cuando se toca el enviar se llama este metodo pero restarting es True.
     @Override public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
-        
+
         // Reset our state.  We want to do this even if restarting, because
         // the underlying state of the text editor could have changed in any way.
         mComposing.setLength(0);
@@ -156,6 +162,10 @@ public class CadencyKeyboard extends InputMethodService
         if (!restarting) {
             // Clear shift states.
             mMetaState = 0;
+        }
+
+        if (session == null) {
+            this.session = new KeyboardSession();
         }
         
         mPredictionOn = false;
@@ -236,6 +246,7 @@ public class CadencyKeyboard extends InputMethodService
      * This is called when the user is done editing a field.  We can use
      * this to reset our state.
      */
+    //Se llama cuando la aplicacion que nos invoco deja de usar el teclado.
     @Override public void onFinishInput() {
         super.onFinishInput();
         
@@ -254,7 +265,8 @@ public class CadencyKeyboard extends InputMethodService
             mInputView.closing();
         }
     }
-    
+
+    //Llamada cuando se dibuja en pantalla el teclado.
     @Override public void onStartInputView(EditorInfo attribute, boolean restarting) {
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
@@ -716,14 +728,12 @@ public class CadencyKeyboard extends InputMethodService
     public void onPress(int primaryCode) {
         //TODO Capturar las teclas como shift y delete de ser necesario u omitir su entrada.
         Long tsLong = System.currentTimeMillis();
-        String letter = Character.toString((char) primaryCode);
-        Log.d("STATE", letter + "-d-" + String.valueOf(tsLong));
+        this.session.appendKeystroke(primaryCode, 'd', tsLong);
     }
     
     public void onRelease(int primaryCode) {
         //TODO Lo mismo que en onPress. Probablemente haga falta un handler por que ambos hacen lo mismo salvo por el log.
         Long tsLong = System.currentTimeMillis();
-        String letter = Character.toString((char) primaryCode);
-        Log.d("STATE", letter + "-u-" + String.valueOf(tsLong));
+        this.session.appendKeystroke(primaryCode, 'u', tsLong);
     }
 }
