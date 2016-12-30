@@ -164,10 +164,10 @@ public class CadencyKeyboard extends InputMethodService
             mMetaState = 0;
         }
 
-        if (session == null) {
-            this.session = new KeyboardSession();
-        }
-        
+        if (this.session == null) this.session = new KeyboardSession();
+
+
+        if (restarting) this.dumpKeyboardSession(); //After send is clicked restart the session.
         mPredictionOn = false;
         mCompletionOn = false;
         mCompletions = null;
@@ -249,11 +249,14 @@ public class CadencyKeyboard extends InputMethodService
     //Se llama cuando la aplicacion que nos invoco deja de usar el teclado.
     @Override public void onFinishInput() {
         super.onFinishInput();
-        
+
         // Clear current composing text and candidates.
         mComposing.setLength(0);
         updateCandidates();
-        
+
+        //Dump KeyboardSession to log file
+        this.dumpKeyboardSession();
+
         // We only hide the candidates window when finishing input on
         // a particular editor, to avoid popping the underlying application
         // up and down if the user is entering text into the bottom of
@@ -735,5 +738,13 @@ public class CadencyKeyboard extends InputMethodService
         //TODO Lo mismo que en onPress. Probablemente haga falta un handler por que ambos hacen lo mismo salvo por el log.
         Long tsLong = System.currentTimeMillis();
         this.session.appendKeystroke(primaryCode, 'u', tsLong);
+    }
+
+    /**
+     * Dumps the current Keyboard session to the log file
+     */
+    private void dumpKeyboardSession(){
+        while(this.session.getNumberOfEntries() > 0)
+            Log.d("CADENCY", this.session.getFirstEntry());
     }
 }
