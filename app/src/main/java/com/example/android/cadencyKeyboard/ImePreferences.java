@@ -18,7 +18,9 @@ package com.example.android.cadencyKeyboard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 import com.android.inputmethodcommon.InputMethodSettingsFragment;
 
 /**
@@ -55,6 +57,22 @@ public class ImePreferences extends PreferenceActivity {
 
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.ime_preferences);
+
+            Preference deleteLogsPref = (Preference) findPreference("delete_logs");
+            deleteLogsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                    Log.d("tag", "ELIMINAR LOG");
+                    return true;
+                }
+            });
+
+            Preference saveDataPref = (Preference) findPreference("send_data");
+            saveDataPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                    Log.d("tag", "ENVIAR DATOS");
+                    return true;
+                }
+            });
         }
     }
 }

@@ -16,4 +16,14 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         android:title="@string/settings_name">
+    <Preference
+        android:title="Delete logs"
+        android:key="delete_logs"
+        android:defaultValue="1"
+        />
+    <Preference
+        android:title="Send data"
+        android:key="send_data"
+        android:defaultValue="1"
+        />
 </PreferenceScreen>
