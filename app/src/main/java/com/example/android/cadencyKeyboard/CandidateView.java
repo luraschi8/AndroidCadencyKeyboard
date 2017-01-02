@@ -257,7 +257,8 @@ public class CandidateView extends View {
         mSelectedIndex = -1;
         invalidate();
     }
-    
+
+
     @Override
     public boolean onTouchEvent(MotionEvent me) {
 
