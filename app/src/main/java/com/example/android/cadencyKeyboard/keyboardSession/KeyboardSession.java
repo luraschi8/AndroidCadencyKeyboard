@@ -10,9 +10,15 @@ import java.util.ArrayList;
 public class KeyboardSession {
 
     private ArrayList<KeystrokeEntry> keystrokeList;
+    private String packageName;
 
-    public KeyboardSession() {
+    public KeyboardSession(String packageName) {
+        this.packageName = packageName;
         keystrokeList = new ArrayList<KeystrokeEntry>();
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     /**

@@ -170,7 +170,7 @@ public class CadencyKeyboard extends InputMethodService
             mMetaState = 0;
         }
 
-        if (this.session == null) this.session = new KeyboardSession();
+        if (this.session == null) this.session = new KeyboardSession(attribute.packageName);
         if(mInputView != null) mInputView.setKeyboardEventCallback(this);
 
         if (restarting) this.dumpKeyboardSession(); //After send is clicked restart the session.
