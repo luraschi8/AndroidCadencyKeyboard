@@ -26,6 +26,7 @@ import android.text.method.MetaKeyKeyListener;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.CompletionInfo;
@@ -34,6 +35,8 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
+import com.example.android.cadencyKeyboard.keyboardSession.KeyDownEntry;
+import com.example.android.cadencyKeyboard.keyboardSession.KeyUpEntry;
 import com.example.android.cadencyKeyboard.keyboardSession.KeyboardSession;
 
 import java.util.ArrayList;
@@ -83,6 +86,9 @@ public class CadencyKeyboard extends InputMethodService
     private String mWordSeparators;
 
     private KeyboardSession session;
+    private float currentPressure;
+    private float currentX;
+    private float currentY;
 
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -165,7 +171,7 @@ public class CadencyKeyboard extends InputMethodService
         }
 
         if (this.session == null) this.session = new KeyboardSession();
-
+        if(mInputView != null) mInputView.setKeyboardEventCallback(this);
 
         if (restarting) this.dumpKeyboardSession(); //After send is clicked restart the session.
         mPredictionOn = false;
@@ -729,15 +735,13 @@ public class CadencyKeyboard extends InputMethodService
     }
     
     public void onPress(int primaryCode) {
-        //TODO Capturar las teclas como shift y delete de ser necesario u omitir su entrada.
         Long tsLong = System.currentTimeMillis();
-        this.session.appendKeystroke(primaryCode, 'd', tsLong);
+        this.session.appendKeystroke(new KeyDownEntry(primaryCode, currentPressure, currentX, currentY ,tsLong));
     }
     
     public void onRelease(int primaryCode) {
-        //TODO Lo mismo que en onPress. Probablemente haga falta un handler por que ambos hacen lo mismo salvo por el log.
         Long tsLong = System.currentTimeMillis();
-        this.session.appendKeystroke(primaryCode, 'u', tsLong);
+        this.session.appendKeystroke(new KeyUpEntry(primaryCode, tsLong));
     }
 
     /**
@@ -746,5 +750,12 @@ public class CadencyKeyboard extends InputMethodService
     private void dumpKeyboardSession(){
         while(this.session.getNumberOfEntries() > 0)
             Log.d("CADENCY", this.session.getFirstEntry());
+    }
+
+    public void handleTouchEvent(MotionEvent event) {
+        if (this.session == null) return; //no session yet
+        currentPressure = event.getPressure();
+        currentX = event.getX();
+        currentY = event.getY();
     }
 }

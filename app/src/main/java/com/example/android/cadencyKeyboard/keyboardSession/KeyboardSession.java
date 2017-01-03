@@ -16,13 +16,11 @@ public class KeyboardSession {
     }
 
     /**
-     * Appends at the bottom of the array a keystroke
-     * @param code primary code of the key pressed
-     * @param type u or d depending ig the key was pressed or released
-     * @param timeStamp timestamp in milisecods of the event
+     * appends a new entry to the session.
+     * @param entry new keystroke entry to append.
      */
-    public void appendKeystroke(int code, char type, Long timeStamp) {
-        boolean result =  keystrokeList.add(new KeystrokeEntry(code, type, timeStamp));
+    public void appendKeystroke(KeystrokeEntry entry) {
+        boolean result =  keystrokeList.add(entry);
         if (!result) throw new RuntimeException("Unknown error adding keystroke to list.");
     }
 

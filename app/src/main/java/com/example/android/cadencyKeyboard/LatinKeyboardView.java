@@ -21,6 +21,7 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.Keyboard.Key;
 import android.inputmethodservice.KeyboardView;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodSubtype;
 
 public class LatinKeyboardView extends KeyboardView {
@@ -29,12 +30,26 @@ public class LatinKeyboardView extends KeyboardView {
     // TODO: Move this into android.inputmethodservice.Keyboard
     static final int KEYCODE_LANGUAGE_SWITCH = -101;
 
+    private CadencyKeyboard keyboard;
+
     public LatinKeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     public LatinKeyboardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
+
+    public void setKeyboardEventCallback(CadencyKeyboard keyboard) {
+        this.keyboard = keyboard;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent me){
+        if (this.keyboard != null) {
+            this.keyboard.handleTouchEvent(me);
+        }
+        return super.onTouchEvent(me);
     }
 
     @Override
