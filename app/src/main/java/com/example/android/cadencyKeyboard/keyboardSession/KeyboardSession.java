@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 public class KeyboardSession {
 
-    private ArrayList<KeystrokeEntry> keystrokeList;
+    private ArrayList<KeyDownEntry> keystrokeList;
     private String packageName;
 
     public KeyboardSession(String packageName) {
         this.packageName = packageName;
-        keystrokeList = new ArrayList<KeystrokeEntry>();
+        keystrokeList = new ArrayList<KeyDownEntry>();
     }
 
     public String getPackageName() {
@@ -25,7 +25,7 @@ public class KeyboardSession {
      * appends a new entry to the session.
      * @param entry new keystroke entry to append.
      */
-    public void appendKeystroke(KeystrokeEntry entry) {
+    public void appendKeystroke(KeyDownEntry entry) {
         boolean result =  keystrokeList.add(entry);
         if (!result) throw new RuntimeException("Unknown error adding keystroke to list.");
     }

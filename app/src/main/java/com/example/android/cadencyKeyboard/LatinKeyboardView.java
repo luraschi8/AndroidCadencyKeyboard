@@ -40,14 +40,12 @@ public class LatinKeyboardView extends KeyboardView {
         super(context, attrs, defStyle);
     }
 
-    public void setKeyboardEventCallback(CadencyKeyboard keyboard) {
-        this.keyboard = keyboard;
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent me){
-        if (this.keyboard != null) {
-            this.keyboard.handleTouchEvent(me);
+        CadencyKeyboard prueba = (CadencyKeyboard) this.getOnKeyboardActionListener();
+        if (prueba != null) {
+           prueba.handleTouchEvent(me);
         }
         return super.onTouchEvent(me);
     }

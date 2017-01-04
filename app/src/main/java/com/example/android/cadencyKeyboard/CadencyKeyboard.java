@@ -36,7 +36,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
 import com.example.android.cadencyKeyboard.keyboardSession.KeyDownEntry;
-import com.example.android.cadencyKeyboard.keyboardSession.KeyUpEntry;
 import com.example.android.cadencyKeyboard.keyboardSession.KeyboardSession;
 
 import java.util.ArrayList;
@@ -86,6 +85,9 @@ public class CadencyKeyboard extends InputMethodService
     private String mWordSeparators;
 
     private KeyboardSession session;
+    private Boolean onKeyPress = false;
+    private int currentKeycode;
+    private Long currentTimestampDown;
     private float currentPressure;
     private float currentX;
     private float currentY;
@@ -171,7 +173,6 @@ public class CadencyKeyboard extends InputMethodService
         }
 
         if (this.session == null) this.session = new KeyboardSession(attribute.packageName);
-        if(mInputView != null) mInputView.setKeyboardEventCallback(this);
 
         if (restarting) this.dumpKeyboardSession(); //After send is clicked restart the session.
         mPredictionOn = false;
@@ -735,13 +736,19 @@ public class CadencyKeyboard extends InputMethodService
     }
     
     public void onPress(int primaryCode) {
-        Long tsLong = System.currentTimeMillis();
-        this.session.appendKeystroke(new KeyDownEntry(primaryCode, currentPressure, currentX, currentY ,tsLong));
+
+        this.currentKeycode = primaryCode;
+        this.onKeyPress = true; //Se hace aca porque puedo tener un touch event fuera de una tecla.
     }
     
     public void onRelease(int primaryCode) {
-        Long tsLong = System.currentTimeMillis();
-        this.session.appendKeystroke(new KeyUpEntry(primaryCode, tsLong));
+        this.dumpKeyToSession(System.currentTimeMillis());
+    }
+
+    private void dumpKeyToSession(Long releaseTime){
+        this.session.appendKeystroke(new KeyDownEntry(this.currentKeycode, this.currentPressure, this.currentX, this.currentY,
+                this.currentTimestampDown, releaseTime));
+        this.onKeyPress = false;
     }
 
     /**
@@ -749,13 +756,15 @@ public class CadencyKeyboard extends InputMethodService
      */
     private void dumpKeyboardSession(){
         while(this.session.getNumberOfEntries() > 0)
-            Log.d("CADENCY", this.session.getFirstEntry());
+            Log.d("KEYSTROKE", this.session.getFirstEntry());
     }
 
     public void handleTouchEvent(MotionEvent event) {
-        if (this.session == null) return; //no session yet
-        currentPressure = event.getPressure();
-        currentX = event.getX();
-        currentY = event.getY();
+        if (this.session == null || event.getActionMasked() == MotionEvent.ACTION_UP) return; //no session yet
+        if(onKeyPress && event.getActionMasked() == MotionEvent.ACTION_DOWN) this.dumpKeyToSession(0L);
+        this.currentPressure = event.getPressure();
+        this.currentX = event.getX();
+        this.currentY = event.getY();
+        this.currentTimestampDown = System.currentTimeMillis();
     }
 }
