@@ -11,9 +11,11 @@ public class KeyboardSession {
 
     private ArrayList<KeyDownEntry> keystrokeList;
     private String packageName;
+    private Long startTime;
 
     public KeyboardSession(String packageName) {
         this.packageName = packageName;
+        this.startTime = System.currentTimeMillis();
         keystrokeList = new ArrayList<KeyDownEntry>();
     }
 
@@ -28,6 +30,10 @@ public class KeyboardSession {
     public void appendKeystroke(KeyDownEntry entry) {
         boolean result =  keystrokeList.add(entry);
         if (!result) throw new RuntimeException("Unknown error adding keystroke to list.");
+    }
+
+    public Long getStartTime() {
+        return startTime;
     }
 
     /**

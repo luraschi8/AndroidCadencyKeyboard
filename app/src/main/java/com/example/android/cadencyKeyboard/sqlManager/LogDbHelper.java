@@ -7,8 +7,13 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 
-import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_CREATE_ENTRIES;
-import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_DELETE_ENTRIES;
+import com.example.android.cadencyKeyboard.keyboardSession.KeyDownEntry;
+import com.example.android.cadencyKeyboard.keyboardSession.KeyboardSession;
+
+import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_CREATE_KEYSTROKES;
+import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_CREATE_SESSIONS;
+import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_DELETE_KEYSTROKES;
+import static com.example.android.cadencyKeyboard.sqlManager.KeystrokeLogContract.SQL_DELETE_SESSIONS;
 
 /**
  * Created by matias on 1/1/17.
@@ -26,14 +31,16 @@ public class LogDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_KEYSTROKES);
+        db.execSQL(SQL_CREATE_SESSIONS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        db.execSQL(SQL_DELETE_ENTRIES);
+        db.execSQL(SQL_DELETE_KEYSTROKES);
+        db.execSQL(SQL_DELETE_SESSIONS);
         onCreate(db);
     }
 
@@ -43,18 +50,28 @@ public class LogDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Use this methid to insert a new entry in the db.
-     * @param keycode primary code of the key pressed
-     * @param type type of event. It can be u or d.
-     * @param timestamp timestamp of the event/
-     * @return returns the id of the new entry or -1 if error.
+     * Use this method to insert a new session to the session table.
+     * @param session session to be inserted in the db. The entries are not inserted.
+     * @return id of the just inserted session. -1 if error.
      */
-    public long insertEntry (String keycode, String type, String timestamp) {
+    public long insertSession (KeyboardSession session) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_KEYCODE, keycode);
-        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_TYPE, type);
-        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_TIMESTAMP, timestamp);
+        contentValues.put(KeystrokeLogContract.SessionEntry.COLUMN_NAME_STARTTIME, session.getStartTime());
+        contentValues.put(KeystrokeLogContract.SessionEntry.COLUMN_NAME_PACKAGE, session.getPackageName());
+        return db.insert(KeystrokeLogContract.SessionEntry.TABLE_NAME, null, contentValues);
+    }
+
+    public long insertKeystrokeToSession(KeyDownEntry entry, long sessionId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_KEYCODE, entry.getKeycode());
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_PRESSURE, entry.getPressure());
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_SESSIONID, sessionId);
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_TIMESTAMPDOWN, entry.getTimestampDown());
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_TIMESTAMPUP, entry.getTimestampUp());
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_X, entry.getX());
+        contentValues.put(KeystrokeLogContract.LogEntry.COLUMN_NAME_Y, entry.getY());
         return db.insert(KeystrokeLogContract.LogEntry.TABLE_NAME, null, contentValues);
     }
 
