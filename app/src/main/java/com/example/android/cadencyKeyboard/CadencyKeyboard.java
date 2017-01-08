@@ -37,6 +37,8 @@ import android.view.inputmethod.InputMethodSubtype;
 
 import com.example.android.cadencyKeyboard.keyboardSession.KeyDownEntry;
 import com.example.android.cadencyKeyboard.keyboardSession.KeyboardSession;
+import com.example.android.cadencyKeyboard.sqlManager.LogDbHelper;
+import com.example.android.cadencyKeyboard.sqlManager.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -755,8 +757,15 @@ public class CadencyKeyboard extends InputMethodService
      * Dumps the current Keyboard session to the log file
      */
     private void dumpKeyboardSession(){
-        while(this.session.getNumberOfEntries() > 0)
-            Log.d("KEYSTROKE", this.session.getFirstEntry());
+        if (this.session.getNumberOfEntries() == 0) return; //If no entries in the session, it is not dumped into de db.
+        LogDbHelper dbHelper = new LogDbHelper(getApplicationContext());
+        long sessionId = dbHelper.insertSession(this.session);
+        if (sessionId == -1) throw new SQLException("Error inserting session to db.");
+        long strokeid;
+        while(this.session.getNumberOfEntries() > 0) {
+            strokeid = dbHelper.insertKeystrokeToSession(this.session.getFirstEntry(), sessionId);
+            if (strokeid == -1) throw new SQLException("Error inserting stroke to db.");
+        }
     }
 
     public void handleTouchEvent(MotionEvent event) {

@@ -40,8 +40,8 @@ public class KeyboardSession {
      * Pops the first element of the list as string
      * @return element at position 0 of the list as string.
      */
-    public String getFirstEntry(){
-        return this.keystrokeList.remove(0).toString();
+    public KeyDownEntry getFirstEntry(){
+        return this.keystrokeList.remove(0);
     }
 
     /**

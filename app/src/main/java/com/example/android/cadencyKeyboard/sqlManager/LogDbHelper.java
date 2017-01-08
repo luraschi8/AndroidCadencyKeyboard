@@ -75,9 +75,10 @@ public class LogDbHelper extends SQLiteOpenHelper {
         return db.insert(KeystrokeLogContract.LogEntry.TABLE_NAME, null, contentValues);
     }
 
-    public Cursor getData(int id) {
+    public Cursor getKeystrokesFromSession(int session_id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from " + KeystrokeLogContract.LogEntry.TABLE_NAME + " where id="+id+"", null );
+        Cursor res =  db.rawQuery( "select * from " + KeystrokeLogContract.LogEntry.TABLE_NAME + " where " +
+                KeystrokeLogContract.LogEntry.COLUMN_NAME_SESSIONID +"=" + session_id + "", null );
         return res;
     }
 
@@ -87,17 +88,6 @@ public class LogDbHelper extends SQLiteOpenHelper {
         return numRows;
     }
 
-/*    public boolean updateContact (Integer id, String name, String phone, String email, String street,String place) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("name", name);
-        contentValues.put("phone", phone);
-        contentValues.put("email", email);
-        contentValues.put("street", street);
-        contentValues.put("place", place);
-        db.update("contacts", contentValues, "id = ? ", new String[] { Integer.toString(id) } );
-        return true;
-    }*/
 
     public Integer deleteEntry (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
