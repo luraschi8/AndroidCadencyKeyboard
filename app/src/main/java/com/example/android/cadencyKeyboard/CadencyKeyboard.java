@@ -595,9 +595,9 @@ public class CadencyKeyboard extends InputMethodService
     public void setSuggestions(List<String> suggestions, boolean completions,
             boolean typedWordValid) {
         if (suggestions != null && suggestions.size() > 0) {
-            setCandidatesViewShown(true);
+            setCandidatesViewShown(false); //To show candidates set to true.
         } else if (isExtractViewShown()) {
-            setCandidatesViewShown(true);
+            setCandidatesViewShown(false); //To show candidates set to true.
         }
         if (mCandidateView != null) {
             mCandidateView.setSuggestions(suggestions, completions, typedWordValid);
