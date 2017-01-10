@@ -16,14 +16,28 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         android:title="@string/settings_name">
-    <Preference
-        android:title="Delete logs"
-        android:key="delete_logs"
-        android:defaultValue="1"
-        />
-    <Preference
-        android:title="Send data"
-        android:key="send_data"
-        android:defaultValue="1"
-        />
+    <PreferenceCategory android:title="Security Actions">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="Lock Device"
+            android:key="lock_switch" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="Email Alert"
+            android:key="email_alert_switch" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Log Preferences">
+        <Preference
+            android:title="Delete logs"
+            android:key="delete_logs"
+            android:defaultValue="1"
+            />
+        <Preference
+            android:title="Send data"
+            android:key="send_data"
+            android:defaultValue="1"
+            />
+    </PreferenceCategory>
+
 </PreferenceScreen>

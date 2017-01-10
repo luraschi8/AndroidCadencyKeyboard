@@ -39,6 +39,7 @@ public class LogDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
+        //TODO Revisar esto.
         db.execSQL(SQL_DELETE_KEYSTROKES);
         db.execSQL(SQL_DELETE_SESSIONS);
         onCreate(db);
@@ -47,6 +48,15 @@ public class LogDbHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public void restartDb(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(SQL_DELETE_SESSIONS);
+        db.execSQL(SQL_DELETE_KEYSTROKES);
+        db.execSQL(SQL_CREATE_SESSIONS);
+        db.execSQL(SQL_CREATE_KEYSTROKES);
+        return;
     }
 
     /**

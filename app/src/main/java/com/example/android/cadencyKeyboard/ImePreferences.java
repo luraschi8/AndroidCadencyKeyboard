@@ -16,12 +16,14 @@
 
 package com.example.android.cadencyKeyboard;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 import com.android.inputmethodcommon.InputMethodSettingsFragment;
+import com.example.android.cadencyKeyboard.sqlManager.LogDbHelper;
 
 /**
  * Displays the IME preferences inside the input method setting.
@@ -61,7 +63,10 @@ public class ImePreferences extends PreferenceActivity {
             Preference deleteLogsPref = (Preference) findPreference("delete_logs");
             deleteLogsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
+                    //TODO Hacer el dialog box de esto.
                     Log.d("tag", "ELIMINAR LOG");
+                    LogDbHelper helper = new LogDbHelper(getContext());
+                    helper.restartDb();
                     return true;
                 }
             });
