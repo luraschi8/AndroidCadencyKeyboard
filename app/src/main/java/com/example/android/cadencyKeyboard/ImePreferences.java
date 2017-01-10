@@ -17,18 +17,30 @@
 package com.example.android.cadencyKeyboard;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 import com.android.inputmethodcommon.InputMethodSettingsFragment;
 import com.example.android.cadencyKeyboard.sqlManager.LogDbHelper;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Displays the IME preferences inside the input method setting.
  */
 public class ImePreferences extends PreferenceActivity {
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
     @Override
     public Intent getIntent() {
         final Intent modIntent = new Intent(super.getIntent());
@@ -43,11 +55,50 @@ public class ImePreferences extends PreferenceActivity {
 
         // We overwrite the title of the activity, as the default one is "Voice Search".
         setTitle(R.string.settings_name);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
     protected boolean isValidFragment(final String fragmentName) {
         return Settings.class.getName().equals(fragmentName);
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("ImePreferences Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 
     public static class Settings extends InputMethodSettingsFragment {
@@ -64,9 +115,27 @@ public class ImePreferences extends PreferenceActivity {
             deleteLogsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
                     //TODO Hacer el dialog box de esto.
-                    Log.d("tag", "ELIMINAR LOG");
-                    LogDbHelper helper = new LogDbHelper(getContext());
-                    helper.restartDb();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder
+                            .setTitle("Delete Information?")
+                            .setMessage("Do you really want to delete all your information?" +
+                                    "If you do it, the keyboard may not be able to detect intruders properly.")
+                            .setCancelable(false)
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    LogDbHelper helper = new LogDbHelper(getActivity());
+                                    helper.restartDb();
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // if this button is clicked, just close
+                                    // the dialog box and do nothing
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                     return true;
                 }
             });
