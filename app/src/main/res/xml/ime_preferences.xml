@@ -33,11 +33,11 @@
             android:key="delete_logs"
             android:defaultValue="1"
             />
-        <Preference
-            android:title="Send data"
-            android:key="send_data"
-            android:defaultValue="1"
-            />
     </PreferenceCategory>
+    <Preference
+        android:title="Send data"
+        android:key="send_data"
+        android:defaultValue="1"
+        android:id="@+id/preference" />
 
 </PreferenceScreen>

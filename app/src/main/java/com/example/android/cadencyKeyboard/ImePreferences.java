@@ -19,11 +19,18 @@ package com.example.android.cadencyKeyboard;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.SwitchPreference;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import com.android.inputmethodcommon.InputMethodSettingsFragment;
 import com.example.android.cadencyKeyboard.sqlManager.LogDbHelper;
 import com.google.android.gms.appindexing.Action;
@@ -40,6 +47,8 @@ public class ImePreferences extends PreferenceActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+
+    public static String alertAddressKey = "alert_email_address";
 
     @Override
     public Intent getIntent() {
@@ -111,10 +120,63 @@ public class ImePreferences extends PreferenceActivity {
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.ime_preferences);
 
+            final SwitchPreference emailAlertPref = (SwitchPreference) findPreference("email_alert_switch");
+            emailAlertPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if ((boolean) newValue) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        final EditText input = new EditText(getContext());
+                        input.setSingleLine();
+                        SharedPreferences sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+                        String hint = "your@email.com";
+                        if (sharedPreferences.contains(alertAddressKey)) {
+                            input.setText(sharedPreferences.getString(alertAddressKey, "default"));
+                        } else  input.setHint(hint);
+                        builder
+                                .setTitle("Email Alert Address")
+                                .setMessage("Set your email address.")
+                                .setView(input)
+                                .setCancelable(false)
+                                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //For old versions of Android. Button is not created if there is no handler.
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                        final AlertDialog dialog = builder.create();
+                        dialog.show();
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View v) {
+                                String email = input.getText().toString();
+                                if (android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                                    SharedPreferences sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(alertAddressKey, input.getText().toString());
+                                    editor.apply();
+                                    dialog.dismiss();
+                                    Toast.makeText(getActivity(), "Email address saved.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "Invalid email address.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                    return true;
+                }
+            });
+
             Preference deleteLogsPref = (Preference) findPreference("delete_logs");
             deleteLogsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                    //TODO Hacer el dialog box de esto.
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder
                             .setTitle("Delete Information?")
@@ -125,6 +187,7 @@ public class ImePreferences extends PreferenceActivity {
                                 public void onClick(DialogInterface dialog, int id) {
                                     LogDbHelper helper = new LogDbHelper(getActivity());
                                     helper.restartDb();
+                                    Toast.makeText(getActivity(), "Database erased.", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
