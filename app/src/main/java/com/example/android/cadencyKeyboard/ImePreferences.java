@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -38,6 +39,12 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+
 /**
  * Displays the IME preferences inside the input method setting.
  */
@@ -49,6 +56,8 @@ public class ImePreferences extends PreferenceActivity {
     private GoogleApiClient client;
 
     public static String alertAddressKey = "alert_email_address";
+    public static final int INTENT_REQUEST_CODE = 1001;
+    public static final String SHARE_LOG_EMAIL = "luraschi8@gmail.com";
 
     @Override
     public Intent getIntent() {
@@ -206,10 +215,52 @@ public class ImePreferences extends PreferenceActivity {
             Preference saveDataPref = (Preference) findPreference("send_data");
             saveDataPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                    Log.d("tag", "ENVIAR DATOS");
+                    File logFile;
+                    try {
+                        logFile = File.createTempFile("keystroke", "log", getContext().getCacheDir());
+                    } catch (IOException e) {
+                        Log.e("ERROR.IO", e.getMessage());
+                        Toast.makeText(getContext(), "Error creating file.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    FileOutputStream outputStream;
+                    try {
+                        outputStream = new FileOutputStream(logFile);
+                        String manufacturerModel = Build.MANUFACTURER + " " + Build.MODEL;
+                        outputStream.write(manufacturerModel.getBytes());
+                    } catch (FileNotFoundException e) {
+                        Log.e("ERROR.IO", e.getMessage());
+                        Toast.makeText(getContext(), "Error opening stream to file.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    } catch (IOException e) {
+                        Log.e("ERROR.IO", e.getMessage());
+                        Toast.makeText(getContext(), "Error writing to file.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+
+
+
+                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                    // set the type to 'email'
+                    emailIntent.setData(Uri.parse("mailto:" + SHARE_LOG_EMAIL));
+                    emailIntent .setType("text/plain");
+                    //String to[] = {SHARE_LOG_EMAIL};
+                    //emailIntent .putExtra(Intent.EXTRA_EMAIL, to);
+                    // the attachment
+                    emailIntent .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile));
+                    // the mail subject
+                    emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Shared Log");
+                    startActivity(Intent.createChooser(emailIntent , "Chose email client."));
+
+                    if (!logFile.delete()) {
+                        Log.e("ERROR.IO", "Error deleting file.");
+                    }
                     return true;
                 }
+
             });
+
         }
+
     }
 }
