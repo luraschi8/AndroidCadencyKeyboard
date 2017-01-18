@@ -217,7 +217,7 @@ public class ImePreferences extends PreferenceActivity {
                 public boolean onPreferenceClick(Preference preference) {
                     File logFile;
                     try {
-                        logFile = File.createTempFile("keystroke", "log", getContext().getCacheDir());
+                        logFile = File.createTempFile("keystroke", "log", getContext().getExternalCacheDir());
                     } catch (IOException e) {
                         Log.e("ERROR.IO", e.getMessage());
                         Toast.makeText(getContext(), "Error creating file.", Toast.LENGTH_SHORT).show();
@@ -239,22 +239,16 @@ public class ImePreferences extends PreferenceActivity {
                     }
 
 
-
                     Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                    // set the type to 'email'
-                    emailIntent.setData(Uri.parse("mailto:" + SHARE_LOG_EMAIL));
+
                     emailIntent .setType("text/plain");
-                    //String to[] = {SHARE_LOG_EMAIL};
-                    //emailIntent .putExtra(Intent.EXTRA_EMAIL, to);
+                    emailIntent.setData(Uri.parse("mailto:" + SHARE_LOG_EMAIL));
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "My email's subject");
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, "My email's body");
                     // the attachment
-                    emailIntent .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile));
-                    // the mail subject
-                    emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Shared Log");
+                    emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile));
                     startActivity(Intent.createChooser(emailIntent , "Chose email client."));
 
-                    if (!logFile.delete()) {
-                        Log.e("ERROR.IO", "Error deleting file.");
-                    }
                     return true;
                 }
 
