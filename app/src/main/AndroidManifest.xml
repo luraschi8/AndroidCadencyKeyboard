@@ -9,11 +9,23 @@
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
 
-        <activity android:name="com.example.android.cadencyKeyboard.ImePreferences" android:label="Cadency Keyboard Settings">
+        <activity android:name="com.example.android.cadencyKeyboard.ImePreferences"
+                android:label="Cadency Keyboard Settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
-        </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+        </activity>
+        <receiver android:name="com.example.android.cadencyKeyboard.AdminReceiver"
+                android:label="Cadency Keyboard Admin Receiver"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data android:name="android.app.device_admin"
+                    android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.gms.version"

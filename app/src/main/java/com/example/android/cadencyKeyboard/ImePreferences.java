@@ -16,7 +16,11 @@
 
 package com.example.android.cadencyKeyboard;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +30,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.util.Log;
 import android.view.View;
@@ -56,8 +61,10 @@ public class ImePreferences extends PreferenceActivity {
     private GoogleApiClient client;
 
     public static String alertAddressKey = "alert_email_address";
-    public static final int INTENT_REQUEST_CODE = 1001;
     public static final String SHARE_LOG_EMAIL = "luraschi8@gmail.com";
+    public static DevicePolicyManager deviceManger;
+    public static ActivityManager activityManager;
+    public static ComponentName compName;
 
     @Override
     public Intent getIntent() {
@@ -76,6 +83,10 @@ public class ImePreferences extends PreferenceActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        deviceManger = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+        activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        compName = new ComponentName(this, AdminReceiver.class);
     }
 
     @Override
@@ -119,15 +130,48 @@ public class ImePreferences extends PreferenceActivity {
         client.disconnect();
     }
 
+
     public static class Settings extends InputMethodSettingsFragment {
+
+        public static final int ADMIN_INTENT_REQUEST_CODE = 1001;
+        public SwitchPreference lockDevicePref;
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data){
+            if (requestCode == ADMIN_INTENT_REQUEST_CODE) if (resultCode == RESULT_OK) {
+                lockDevicePref.setChecked(true);
+            }
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setInputMethodSettingsCategoryTitle(R.string.language_selection_title);
             setSubtypeEnablerTitle(R.string.select_language);
 
+
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.ime_preferences);
+
+            lockDevicePref = (SwitchPreference) findPreference("lock_switch");
+
+            lockDevicePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if ((boolean) newValue && !deviceManger.isAdminActive(compName)) {
+                        Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+                        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                                "The keyboard uses this to lock down the device when an intruder is detected.");
+                        startActivityForResult(intent, ADMIN_INTENT_REQUEST_CODE);
+                        return false;
+                    }
+                    if (!(boolean) newValue){
+                        deviceManger.removeActiveAdmin(compName);
+                    }
+                    return true;
+                }
+            });
 
             final SwitchPreference emailAlertPref = (SwitchPreference) findPreference("email_alert_switch");
             emailAlertPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -211,6 +255,7 @@ public class ImePreferences extends PreferenceActivity {
                     return true;
                 }
             });
+
 
             Preference saveDataPref = (Preference) findPreference("send_data");
             saveDataPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
